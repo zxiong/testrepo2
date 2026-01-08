@@ -15,7 +15,7 @@ metadata:
     appstudio.openshift.io/application: test-app1
     appstudio.openshift.io/component: test-fbc-fips1
     pipelines.appstudio.openshift.io/type: build
-  name: testrepo-fbc-test2-on-pull-request
+  name: test-fbc-fips1-pull-request
   namespace: zxiong-tenant
 spec:
   timeout: "4h"
