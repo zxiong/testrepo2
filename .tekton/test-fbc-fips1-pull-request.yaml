@@ -143,7 +143,7 @@ spec:
         - name: name
           value: split-images-into-buckets
         - name: bundle
-          value: "quay.io/zxiong/task-split-images-into-buckets:0.1"
+          value: "quay.io/zxiong/task-split-images-into-buckets:0.2"
         - name: kind
           value: task
         resolver: bundles
