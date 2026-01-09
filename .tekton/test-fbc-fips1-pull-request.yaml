@@ -33,9 +33,7 @@ spec:
   - name: NUM_BUCKETS
     value: "1"
   - name: RELATED_IMAGES
-    value:
-      - "registry.redhat.io/rhaiis/vllm-cuda-rhel9@sha256:094db84a1da5e8a575d0c9eade114fa30f4a2061064a338e3e032f3578f8082a"
-      - "registry.redhat.io/openshift4/ose-prom-label-proxy-rhel9@sha256:023cf36b1efe4b343dfcb26c43fd2984083f4532c6ebb1f4b7418a6e282e6f01"
+    value: "registry.redhat.io/rhaiis/vllm-cuda-rhel9@sha256:094db84a1da5e8a575d0c9eade114fa30f4a2061064a338e3e032f3578f8082a registry.redhat.io/openshift4/ose-prom-label-proxy-rhel9@sha256:023cf36b1efe4b343dfcb26c43fd2984083f4532c6ebb1f4b7418a6e282e6f01"
   pipelineSpec:
     params:
     - description: Source Repository URL
@@ -89,8 +87,8 @@ spec:
       type: string
     - description: Array of related images to check for FIPS compliance
       name: RELATED_IMAGES
-      type: array
-      default: []
+      type: string
+      default: ""
     - description: Number of parallel TaskRuns (buckets) to create
       name: NUM_BUCKETS
       type: string
@@ -152,7 +150,7 @@ spec:
       params:
       - name: IMAGES
         value:
-        - $(params.RELATED_IMAGES[*])
+        - $(params.RELATED_IMAGES)
       - name: NUM_BUCKETS
         value: $(params.NUM_BUCKETS)
     #- name: fips-operator-check-step-action-test
