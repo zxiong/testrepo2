@@ -143,14 +143,13 @@ spec:
         - name: name
           value: split-images-into-buckets
         - name: bundle
-          value: "quay.io/zxiong/task-split-images-into-buckets:0.2"
+          value: "quay.io/zxiong/task-split-images-into-buckets:0.1"
         - name: kind
           value: task
         resolver: bundles
       params:
       - name: IMAGES
-        value:
-        - $(params.RELATED_IMAGES)
+        value: "$(params.RELATED_IMAGES)"
       - name: NUM_BUCKETS
         value: $(params.NUM_BUCKETS)
     #- name: fips-operator-check-step-action-test
