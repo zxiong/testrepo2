@@ -92,7 +92,7 @@ spec:
     - description: Number of parallel TaskRuns (buckets) to create
       name: NUM_BUCKETS
       type: string
-      default: "1"
+      default: "2"
     tasks:
     #- name: fbc-fips-check-oci-ta
     #  timeout: "4h"
@@ -152,28 +152,28 @@ spec:
         value: "$(params.RELATED_IMAGES)"
       - name: NUM_BUCKETS
         value: $(params.NUM_BUCKETS)
-    #- name: fips-operator-check-step-action-test
-    #  timeout: "4h"
-    #  runAfter:
-    #    - split-images-into-buckets
-    #  matrix:
-    #    params:
-    #      - name: RELATED_IMAGES
-    #        value: $(tasks.split-images-into-buckets.results.BUCKETS[*])
-    #  params:
-    #    - name: TARGET_OCP_VERSION
-    #      value: ""
-    #    - name: MAX_PARALLEL
-    #      value: 2
-    #  taskRef:
-    #    params:
-    #    - name: name
-    #      value: fips-operator-check-step-action-test
-    #    - name: bundle
-    #      value: "quay.io/zxiong/task-fips-operator-check-step-action-test:0.1"
-    #    - name: kind
-    #      value: task
-    #    resolver: bundles
+    - name: fips-operator-check-step-action-test
+      timeout: "4h"
+      runAfter:
+        - split-images-into-buckets
+      matrix:
+        params:
+          - name: RELATED_IMAGES
+            value: $(tasks.split-images-into-buckets.results.BUCKETS[*])
+      params:
+        - name: TARGET_OCP_VERSION
+          value: ""
+        - name: MAX_PARALLEL
+          value: 2
+      taskRef:
+        params:
+        - name: name
+          value: fips-operator-check-step-action-test
+        - name: bundle
+          value: "quay.io/zxiong/task-fips-operator-check-step-action-test:0.1"
+        - name: kind
+          value: task
+        resolver: bundles
     workspaces:
     - name: git-auth
       optional: true
