@@ -31,7 +31,7 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: NUM_BUCKETS
-    value: "1"
+    value: "2"
   - name: RELATED_IMAGES
     value: "registry.redhat.io/rhaiis/vllm-cuda-rhel9@sha256:094db84a1da5e8a575d0c9eade114fa30f4a2061064a338e3e032f3578f8082a registry.redhat.io/openshift4/ose-prom-label-proxy-rhel9@sha256:023cf36b1efe4b343dfcb26c43fd2984083f4532c6ebb1f4b7418a6e282e6f01"
   pipelineSpec:
