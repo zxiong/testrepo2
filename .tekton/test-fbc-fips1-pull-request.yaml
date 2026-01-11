@@ -33,6 +33,8 @@ spec:
     value: Dockerfile
   - name: NUM_BUCKETS
     value: "2"
+  - name: MAX_PARALLEL
+    value: "2"
   pipelineSpec:
     params:
     - description: Source Repository URL
@@ -88,6 +90,10 @@ spec:
       name: NUM_BUCKETS
       type: string
       default: "2"
+    - description: Maximum number of images to check in parallel
+      name: MAX_PARALLEL
+      type: string
+      default: "5"
     tasks:
     #
     # TASK 1: Extract images, create OCI artifact, and generate bucket indices
@@ -215,6 +221,8 @@ spec:
         value: "$(tasks.prepare-images-and-buckets.results.IMAGES_ARTIFACT)"
       - name: TARGET_OCP_VERSION
         value: ""
+      - name: MAX_PARALLEL
+        value: $(params.MAX_PARALLEL)
       matrix:
         params:
           - name: BUCKET_INDEX
@@ -227,6 +235,8 @@ spec:
             type: string
           - name: TARGET_OCP_VERSION
             type: string
+          - name: MAX_PARALLEL
+            type: string 
         volumes:
           - name: workdir
             emptyDir: {}
