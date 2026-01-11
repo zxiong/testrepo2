@@ -108,6 +108,13 @@ spec:
           - name: BUCKET_INDICES
             type: array
             description: Array of bucket indices for matrix expansion
+        volumes:
+          - name: workdir
+            emptyDir: {}
+        stepTemplate:
+          volumeMounts:
+            - name: workdir
+              mountPath: /var/workdir  
         steps:
           # Step 1: Extract images and split into bucket files
           - name: extract-and-split-images
@@ -220,6 +227,13 @@ spec:
             type: string
           - name: TARGET_OCP_VERSION
             type: string
+        volumes:
+          - name: workdir
+            emptyDir: {}
+        stepTemplate:
+          volumeMounts:
+            - name: workdir
+              mountPath: /var/workdir
         steps:
           # Step 1: Create directory for artifact extraction
           - name: prepare-workdir
