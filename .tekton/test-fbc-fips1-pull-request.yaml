@@ -32,7 +32,7 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: NUM_BUCKETS
-    value: "2"
+    value: "4"
   pipelineSpec:
     params:
     - description: Source Repository URL
@@ -87,7 +87,7 @@ spec:
     - description: Number of parallel TaskRuns (buckets) to create
       name: NUM_BUCKETS
       type: string
-      default: "2"
+      default: "4"
     tasks:
     #
     # TASK 1: Extract images, create OCI artifact, and generate bucket indices
@@ -132,8 +132,8 @@ spec:
               # Simulate extracting images (replace with real extraction)
               # In real case, this would be from fbc-extract-images-oci-ta
               all_images=(
-                "registry.redhat.io/rhoai/odh-training-rocm62-torch25-py311-rhel9@sha256:e950fc961dd81bae356a5ae93cdd00c4b50799fef0ce742d92b3feeae08dcc40"
-                "registry.redhat.io/rhoai/odh-training-rocm62-torch24-py311-rhel9@sha256:38568cb655ff565b32ce92a735b9e2ff802f86f08837c260a854d039954a8b54"
+                "registry.redhat.io/rhaiis/vllm-cuda-rhel9@sha256:094db84a1da5e8a575d0c9eade114fa30f4a2061064a338e3e032f3578f8082a"
+                "registry.redhat.io/openshift4/ose-prom-label-proxy-rhel9@sha256:023cf36b1efe4b343dfcb26c43fd2984083f4532c6ebb1f4b7418a6e282e6f01"
               )
 
               num_images=${#all_images[@]}
@@ -250,8 +250,8 @@ spec:
             args:
               - use
               - $(params.IMAGES_ARTIFACT)=/var/workdir/artifact-data
-          # Step 3: Read bucket file and process images
-          - name: read-bucket-and-fips-check
+          # Step 3: Read bucket file and prepare input files for FIPS check
+          - name: prepare-bucket-images
             image: quay.io/konflux-ci/konflux-test:v1.4.41@sha256:afea44d83043be7f528ec2cacaeb0c3b69cdafdd86a1b930957def38400f8a6c
             env:
               - name: BUCKET_INDEX
@@ -293,21 +293,29 @@ spec:
                 echo "Target OCP version: ${TARGET_OCP_VERSION}"
               fi
 
+              echo "Prepared ${num_bucket_images} images for FIPS compliance check"
               echo "=========================================="
-              echo "Starting FIPS compliance checks..."
-              echo "=========================================="
-
-              # TODO: Replace this with actual fips-operator-check-step-action
-              # For now, simulate processing
-              for img in "${bucket_images[@]}"; do
-                echo "Checking FIPS compliance for: ${img}"
-                # Your actual FIPS check logic here
-                # Could use fips-operator-check-step-action stepaction
-              done
-
-              echo "=========================================="
-              echo "Bucket ${BUCKET_INDEX} complete: Checked ${num_bucket_images} images"
-              echo "=========================================="
+          # Step 4: Run FIPS operator check
+          - name: fips-operator-check-step-action
+            params:
+              - name: MAX_PARALLEL
+                value: $(params.MAX_PARALLEL)
+            computeResources:
+              limits:
+                cpu: "2"
+                memory: 4Gi
+              requests:
+                cpu: "2"
+                memory: 4Gi
+            ref:
+              params:
+                - name: url
+                  value: https://github.com/konflux-ci/build-definitions
+                - name: revision
+                  value: ac78bc7b6ea4d34781a4cff44ae9647745e2e65d
+                - name: pathInRepo
+                  value: stepactions/fips-operator-check-step-action/0.1/fips-operator-check-step-action.yaml
+              resolver: git      
             computeResources:
               limits:
                 cpu: "2"
