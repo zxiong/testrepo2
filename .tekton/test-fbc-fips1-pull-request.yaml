@@ -152,7 +152,6 @@ spec:
               echo "Split complete!"
               echo "Bucket files created:"
               ls -lh /var/workdir/artifact-data/
-
           # Step 2: Push as OCI trusted artifact
           - name: create-trusted-artifact
             image: quay.io/konflux-ci/build-trusted-artifacts:latest@sha256:aa601d847eafa87747894b770eff43b47cffe2cc39059bb345ee58b378473b8f
@@ -197,7 +196,6 @@ spec:
 
               echo "Generated bucket indices: ${indices_json}"
               echo -n "${indices_json}" > "$(results.BUCKET_INDICES.path)"
-
     #
     # TASK 2: Matrix FIPS check - pulls artifact and processes bucket
     #
@@ -223,14 +221,22 @@ spec:
           - name: TARGET_OCP_VERSION
             type: string
         steps:
-          # Step 1: Pull the OCI artifact
+          # Step 1: Create directory for artifact extraction
+          - name: prepare-workdir
+            image: quay.io/konflux-ci/konflux-test:v1.4.41@sha256:afea44d83043be7f528ec2cacaeb0c3b69cdafdd86a1b930957def38400f8a6c
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              mkdir -p /var/workdir/artifact-data
+              echo "Created /var/workdir/artifact-data directory"
+
+          # Step 2: Pull the OCI artifact
           - name: use-trusted-artifact
             image: quay.io/konflux-ci/build-trusted-artifacts:latest@sha256:aa601d847eafa87747894b770eff43b47cffe2cc39059bb345ee58b378473b8f
             args:
               - use
               - $(params.IMAGES_ARTIFACT)=/var/workdir/artifact-data
-
-          # Step 2: Read bucket file and process images
+          # Step 3: Read bucket file and process images
           - name: read-bucket-and-fips-check
             image: quay.io/konflux-ci/konflux-test:v1.4.41@sha256:afea44d83043be7f528ec2cacaeb0c3b69cdafdd86a1b930957def38400f8a6c
             env:
@@ -294,7 +300,7 @@ spec:
                 memory: 4Gi
               requests:
                 cpu: "1"
-                memory: 2Gi
+                memory: 2Gi  
     workspaces:
     - name: git-auth
       optional: true
