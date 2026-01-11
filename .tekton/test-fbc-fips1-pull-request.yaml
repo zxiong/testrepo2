@@ -140,7 +140,7 @@ spec:
               all_images=(
                 "registry.redhat.io/rhaiis/vllm-cuda-rhel9@sha256:094db84a1da5e8a575d0c9eade114fa30f4a2061064a338e3e032f3578f8082a"
                 "registry.redhat.io/openshift4/ose-prom-label-proxy-rhel9@sha256:023cf36b1efe4b343dfcb26c43fd2984083f4532c6ebb1f4b7418a6e282e6f01"
-                registry.redhat.io/openshift4/ose-cli-rhel9@sha256:854608d87c79214118649df5bc96bd8f03794173489075cbd19e9f0419fb378d"
+                "registry.redhat.io/openshift4/ose-cli-rhel9@sha256:854608d87c79214118649df5bc96bd8f03794173489075cbd19e9f0419fb378d"
                 "registry.redhat.io/openshift4/ose-etcd-rhel9@sha256:734a21e351fe92a2971aeaae4d26fc1c499070863c826d1129ccf536bc3a1576"
                 "registry.redhat.io/openshift-service-mesh/proxyv2-rhel9@sha256:fe1e78971352ddd76ee6f88aa0f4e4ac6d1298da8c960f877ae9f883c291dfd6"
               )
