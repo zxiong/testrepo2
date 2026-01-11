@@ -32,7 +32,7 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: NUM_BUCKETS
-    value: "4"
+    value: "2"
   pipelineSpec:
     params:
     - description: Source Repository URL
@@ -87,7 +87,7 @@ spec:
     - description: Number of parallel TaskRuns (buckets) to create
       name: NUM_BUCKETS
       type: string
-      default: "4"
+      default: "2"
     tasks:
     #
     # TASK 1: Extract images, create OCI artifact, and generate bucket indices
