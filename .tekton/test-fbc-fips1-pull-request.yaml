@@ -32,9 +32,9 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: NUM_BUCKETS
-    value: "4"
+    value: "1"
   - name: MAX_PARALLEL
-    value: "2"
+    value: "8"
   - name: ENABLE_LOAD_BALANCING
     value: "true"
   - name: PARALLEL_FETCH_LIMIT
@@ -514,19 +514,19 @@ spec:
                 value: $(params.MAX_PARALLEL)
             computeResources:
               limits:
-                cpu: "2"
-                memory: 6Gi
+                cpu: "8"
+                memory: 12Gi
               requests:
-                cpu: "2"
-                memory: 6Gi
+                cpu: "8"
+                memory: 12Gi
             ref:
               params:
                 - name: url
-                  #value: https://github.com/konflux-ci/build-definitions
-                  value: https://github.com/zxiong/build-definitions
+                  value: https://github.com/konflux-ci/build-definitions
+                  #value: https://github.com/zxiong/build-definitions
                 - name: revision
-                  #value: ac78bc7b6ea4d34781a4cff44ae9647745e2e65d
-                  value: test-fips-operator-check-step-action-oc-extract
+                  value: ac78bc7b6ea4d34781a4cff44ae9647745e2e65d
+                  #value: test-fips-operator-check-step-action-oc-extract
                 - name: pathInRepo
                   value: stepactions/fips-operator-check-step-action/0.1/fips-operator-check-step-action.yaml
               resolver: git    
