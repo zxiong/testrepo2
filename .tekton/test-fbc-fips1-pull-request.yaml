@@ -107,42 +107,7 @@ spec:
       type: string
       default: "5"
     tasks:
-    #
-    # TASK 1: Extract images, create OCI artifact, and generate bucket indices
-    #
     - name: prepare-images-and-buckets
-      timeout: "5m"
-      params:
-      - name: NUM_BUCKETS
-        value: $(params.NUM_BUCKETS)
-      - name: ENABLE_LOAD_BALANCING
-        value: $(params.ENABLE_LOAD_BALANCING)
-      - name: PARALLEL_FETCH_LIMIT
-        value: $(params.PARALLEL_FETCH_LIMIT)
-      taskSpec:
-        params:
-          - name: NUM_BUCKETS
-            type: string
-          - name: ENABLE_LOAD_BALANCING
-            type: string
-          - name: PARALLEL_FETCH_LIMIT
-            type: string
-        results:
-          - name: IMAGES_ARTIFACT
-            type: string
-            description: OCI reference to images artifact
-          - name: BUCKET_INDICES
-            type: array
-            description: Array of bucket indices for matrix expansion
-        volumes:
-          - name: workdir
-            emptyDir: {}
-        stepTemplate:
-          volumeMounts:
-            - name: workdir
-              mountPath: /var/workdir  
-        steps:
-   - name: prepare-images-and-buckets
       timeout: "5m"
       params:
       - name: NUM_BUCKETS
@@ -194,8 +159,11 @@ spec:
               # Simulate extracting images (replace with real extraction)
               # In real case, this would be from fbc-extract-images-oci-ta
               all_images=(
-                "registry.redhat.io/rhoai/odh-training-rocm62-torch25-py311-rhel9@sha256:e950fc961dd81bae356a5ae93cdd00c4b50799fef0ce742d92b3feeae08dcc40"
-                "registry.redhat.io/rhoai/odh-training-rocm62-torch24-py311-rhel9@sha256:38568cb655ff565b32ce92a735b9e2ff802f86f08837c260a854d039954a8b54"
+                "registry.redhat.io/rhaiis/vllm-cuda-rhel9@sha256:094db84a1da5e8a575d0c9eade114fa30f4a2061064a338e3e032f3578f8082a"
+                "registry.redhat.io/openshift4/ose-prom-label-proxy-rhel9@sha256:023cf36b1efe4b343dfcb26c43fd2984083f4532c6ebb1f4b7418a6e282e6f01"
+                "registry.redhat.io/openshift4/ose-cli-rhel9@sha256:854608d87c79214118649df5bc96bd8f03794173489075cbd19e9f0419fb378d"
+                "registry.redhat.io/openshift4/ose-etcd-rhel9@sha256:734a21e351fe92a2971aeaae4d26fc1c499070863c826d1129ccf536bc3a1576"
+                "registry.redhat.io/openshift-service-mesh/proxyv2-rhel9@sha256:fe1e78971352ddd76ee6f88aa0f4e4ac6d1298da8c960f877ae9f883c291dfd6"
               )
 
               num_images=${#all_images[@]}
@@ -488,7 +456,7 @@ spec:
                   value: ac78bc7b6ea4d34781a4cff44ae9647745e2e65d
                 - name: pathInRepo
                   value: stepactions/fips-operator-check-step-action/0.1/fips-operator-check-step-action.yaml
-              resolver: git
+              resolver: git    
     workspaces:
     - name: git-auth
       optional: true
