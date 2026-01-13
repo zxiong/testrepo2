@@ -515,10 +515,10 @@ spec:
             computeResources:
               limits:
                 cpu: "1"
-                memory: 4Gi
+                memory: 6Gi
               requests:
                 cpu: "1"
-                memory: 4Gi
+                memory: 6Gi
             ref:
               params:
                 - name: url
