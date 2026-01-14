@@ -159,7 +159,7 @@ spec:
               # Simulate extracting images (replace with real extraction)
               # In real case, this would be from fbc-extract-images-oci-ta
               all_images=(
-                "registry.redhat.io/rhoai/odh-training-cuda121-torch24-py311-rhel9@sha256:38bd8a7f22c139a491b6aaa4e70a45d2eb7bfbece0ce816ae3c0e4696d1e87f9"
+                "registry.redhat.io/rhoai/odh-training-rocm62-torch24-py311-rhel9@sha256:38568cb655ff565b32ce92a735b9e2ff802f86f08837c260a854d039954a8b54"
               )
               
               num_images=${#all_images[@]}
