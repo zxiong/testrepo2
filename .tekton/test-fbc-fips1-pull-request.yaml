@@ -424,7 +424,7 @@ spec:
               fi
 
               echo "Prepared ${num_bucket_images} images for FIPS compliance check"
-              echo "=========================================="
+              echo "========================================="
 
           # Step 4: Run FIPS operator check
           - name: fips-operator-check-step-action
