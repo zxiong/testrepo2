@@ -32,11 +32,11 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: NUM_BUCKETS
-    value: "8"
-  - name: MAX_PARALLEL
     value: "1"
+  - name: MAX_PARALLEL
+    value: "8"
   - name: ENABLE_LOAD_BALANCING
-    value: "true"
+    value: "false"
   - name: PARALLEL_FETCH_LIMIT
     value: "5" 
   pipelineSpec:
@@ -514,11 +514,11 @@ spec:
                 value: $(params.MAX_PARALLEL)
             computeResources:
               limits:
-                cpu: "1"
-                memory: 6Gi
+                cpu: "8"
+                memory: 16Gi
               requests:
-                cpu: "1"
-                memory: 6Gi
+                cpu: "8"
+                memory: 16Gi
             ref:
               params:
                 - name: url
