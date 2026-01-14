@@ -441,11 +441,11 @@ spec:
             ref:
               params:
                 - name: url
-                  value: https://github.com/konflux-ci/build-definitions
-                  #value: https://github.com/zxiong/build-definitions
+                  #value: https://github.com/konflux-ci/build-definitions
+                  value: https://github.com/zxiong/build-definitions
                 - name: revision
-                  value: ac78bc7b6ea4d34781a4cff44ae9647745e2e65d
-                  #value: test-fips-operator-check-step-action-oc-extract
+                  #value: ac78bc7b6ea4d34781a4cff44ae9647745e2e65d
+                  value: test-fips-operator-check-step-action-oc-extract
                 - name: pathInRepo
                   value: stepactions/fips-operator-check-step-action/0.1/fips-operator-check-step-action.yaml
               resolver: git    
