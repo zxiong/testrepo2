@@ -33,17 +33,17 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: image-url
-    value: quay.io/redhat-user-workloads/service-mesh-tenant/ossm-fbc-v4-17:on-pr-e3cc9b9d9c523686a3d307189eac6fe8d7f00a70
+    value: quay.io/redhat-user-workloads/rh-mtv-1-tenant/forklift-fbc-prod-v419:on-pr-ced4be1365c1ffaf4482a8990021138065d05875
   - name: image-digest
-    value: sha256:f39be6dfd91eba7696a301148ed0a3aae045c0a31097631e91d8861a4f464732
+    value: sha256:e8cfb482ae21524f798334971806de63c7d6020976e48eae281669e33ae8aa7a
   - name: SOURCE_ARTIFACT
-    value: "oci:quay.io/redhat-user-workloads/service-mesh-tenant/ossm-fbc-v4-17@sha256:730b1238e6e043a8acae687fd48fdbbe78072cc64168314c49f5ac2090a8b15c"
+    value: "oci:quay.io/redhat-user-workloads/rh-mtv-1-tenant/forklift-fbc-prod-v419@sha256:550f80f4af1cf9feb7f82888ea79bc307623905d5ba194a7d3acbb194452dd1f"
   - name: LOAD_BALANCE
     value: "true"
   - name: NUM_BUCKETS
     value: "2"
   - name: MAX_PARALLEL
-    value: "4"
+    value: "2"
   pipelineSpec:
     description: |
       This pipeline is ideal for building and verifying [file-based catalogs](https://konflux-ci.dev/docs/end-to-end/building-olm/#building-the-file-based-catalog).
