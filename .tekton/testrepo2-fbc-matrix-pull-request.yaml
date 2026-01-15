@@ -32,6 +32,16 @@ spec:
     - linux/x86_64
   - name: dockerfile
     value: Dockerfile
+  - name: image-url
+    value: quay.io/redhat-user-workloads/ose-osc-tenant/osc-fbc-4-19:on-pr-51fa2f15aaa1dd73203cc636c3647c2ae02356d0
+  - name: image-digest
+    value: sha256:981e50cc51c449f319c8816b9d83124fed8e098d3eeba7afb69cf90b4d7f56a3
+  - name: SOURCE_ARTIFACT
+    value: "oci:quay.io/redhat-user-workloads/ose-osc-tenant/osc-fbc-4-19@sha256:19d20a2ef4bb6189e2215d6dfbad63bd769158292a8bf86d9f184786a6ac5f06"
+  - name: LOAD_BALANCE
+    value: "true"
+  - name: NUM_BUCKETS
+    value: "1"
   pipelineSpec:
     description: |
       This pipeline is ideal for building and verifying [file-based catalogs](https://konflux-ci.dev/docs/end-to-end/building-olm/#building-the-file-based-catalog).
@@ -106,312 +116,66 @@ spec:
       name: build-platforms
       type: array
     results:
-    - description: ""
-      name: IMAGE_URL
-      value: $(tasks.build-image-index.results.IMAGE_URL)
-    - description: ""
-      name: IMAGE_DIGEST
-      value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-    - description: ""
-      name: CHAINS-GIT_URL
-      value: $(tasks.clone-repository.results.url)
-    - description: ""
-      name: CHAINS-GIT_COMMIT
-      value: $(tasks.clone-repository.results.commit)
+      - name: TOTAL_IMAGES
+        description: Total number of unique images
+        value: $(tasks.extract-and-split.results.TOTAL_IMAGES)
+      - name: BUCKETS_ARTIFACT
+        description: OCI artifact containing buckets
+        value: $(tasks.extract-and-split.results.BUCKETS_ARTIFACT)
     tasks:
-    - name: init
+    - name: extract-and-split
+      timeout: "4h"
       params:
-      - name: image-url
-        value: $(params.output-image)
-      - name: rebuild
-        value: $(params.rebuild)
-      - name: skip-checks
-        value: $(params.skip-checks)
-      - name: enable-cache-proxy
-        value: $(params.enable-cache-proxy)
+        - name: SOURCE_ARTIFACT
+          value: $(params.SOURCE_ARTIFACT)
+        - name: image-digest
+          value: $(params.image-digest)
+        - name: image-url
+          value: $(params.image-url)
+        - name: output-image
+          value: $(params.output-image)
+        - name: NUM_BUCKETS
+          value: $(params.NUM_BUCKETS)
+        - name: LOAD_BALANCE
+          value: $(params.LOAD_BALANCE)
+        - name: SIZE_FETCH_PARALLEL
+          value: "5"
       taskRef:
         params:
         - name: name
-          value: init
+          value: fbc-fips-extract-and-split-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:b349d24cb896573695802d6913d311640b44675ec082b3ad167721946a6a0a71
+          value: quay.io/zxiong/fbc-fips-check-matrix:0.1
         - name: kind
           value: task
         resolver: bundles
-    - name: clone-repository
-      params:
-      - name: url
-        value: $(params.git-url)
-      - name: revision
-        value: $(params.revision)
-      - name: ociStorage
-        value: $(params.output-image).git
-      - name: ociArtifactExpiresAfter
-        value: $(params.image-expires-after)
+      # Task 2: Process buckets in parallel (matrix on BUCKET_INDEX)
+    - name: fips-check-buckets
       runAfter:
-      - init
-      taskRef:
-        params:
-        - name: name
-          value: git-clone-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:56f65a16d3d0485c64ad85af2c1f3e9b0bb4d02d63f2fd0ebb9498d219ca723d
-        - name: kind
-          value: task
-        resolver: bundles
+        - extract-and-split
+      timeout: "4h"
       when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values:
-        - "true"
-      workspaces:
-      - name: basic-auth
-        workspace: git-auth
-    - name: run-opm-command
-      params:
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-      - name: ociStorage
-        value: $(params.output-image).opm
-      - name: ociArtifactExpiresAfter
-        value: $(params.image-expires-after)
-      - name: OPM_ARGS
-        value: []
-      - name: OPM_OUTPUT_PATH
-        value: ""
-      - name: IDMS_PATH
-        value: ""
-      runAfter:
-      - clone-repository
+        - input: "$(tasks.extract-and-split.results.TOTAL_IMAGES)"
+          operator: notin
+          values: ["0"]
+      matrix:
+        params:
+          - name: BUCKET_INDEX
+            value: $(tasks.extract-and-split.results.BUCKET_INDICES[*])
       taskRef:
-        params:
-        - name: name
-          value: run-opm-command-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-run-opm-command-oci-ta:0.1@sha256:671866aa9acb0ec82ef6112411e494eceb2e71786b0519bcd0e60e61e207034e
-        - name: kind
-          value: task
         resolver: bundles
-    - name: prefetch-dependencies
+        params:
+          - name: bundle
+            value: quay.io/zxiong/fbc-fips-check-matrix:0.1
+          - name: name
+            value: fbc-fips-check-bucket-oci-ta
+          - name: kind
+            value: Task
       params:
-      - name: input
-        value: $(params.prefetch-input)
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.run-opm-command.results.SOURCE_ARTIFACT)
-      - name: ociStorage
-        value: $(params.output-image).prefetch
-      - name: ociArtifactExpiresAfter
-        value: $(params.image-expires-after)
-      runAfter:
-      - run-opm-command
-      taskRef:
-        params:
-        - name: name
-          value: prefetch-dependencies-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.2@sha256:36207773434bfad80fc3991d3ccca409d8429dbf5974c4dcd8d54145235b4b7b
-        - name: kind
-          value: task
-        resolver: bundles
-      workspaces:
-      - name: git-basic-auth
-        workspace: git-auth
-      - name: netrc
-        workspace: netrc
-    - matrix:
-        params:
-        - name: PLATFORM
-          value:
-          - $(params.build-platforms)
-      name: build-images
-      params:
-      - name: IMAGE
-        value: $(params.output-image)
-      - name: DOCKERFILE
-        value: $(params.dockerfile)
-      - name: CONTEXT
-        value: $(params.path-context)
-      - name: HERMETIC
-        value: $(params.hermetic)
-      - name: PREFETCH_INPUT
-        value: $(params.prefetch-input)
-      - name: IMAGE_EXPIRES_AFTER
-        value: $(params.image-expires-after)
-      - name: COMMIT_SHA
-        value: $(tasks.clone-repository.results.commit)
-      - name: BUILD_ARGS
-        value:
-        - $(params.build-args[*])
-      - name: BUILD_ARGS_FILE
-        value: $(params.build-args-file)
-      - name: SOURCE_URL
-        value: $(tasks.clone-repository.results.url)
-      - name: HTTP_PROXY
-        value: $(tasks.init.results.http-proxy)
-      - name: NO_PROXY
-        value: $(tasks.init.results.no-proxy)
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-      - name: CACHI2_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
-      - name: IMAGE_APPEND_PLATFORM
-        value: "true"
-      runAfter:
-      - clone-repository
-      taskRef:
-        params:
-        - name: name
-          value: buildah-remote-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.7@sha256:d8b2cd0bd3f8e3fdcafe4aebfee59f3f2fcbca78ef31f9c5dd8ecd781cd02636
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values:
-        - "true"
-    - name: build-image-index
-      params:
-      - name: IMAGE
-        value: $(params.output-image)
-      - name: COMMIT_SHA
-        value: $(tasks.clone-repository.results.commit)
-      - name: IMAGE_EXPIRES_AFTER
-        value: $(params.image-expires-after)
-      - name: ALWAYS_BUILD_INDEX
-        value: $(params.build-image-index)
-      - name: IMAGES
-        value:
-        - $(tasks.build-images.results.IMAGE_REF[*])
-      runAfter:
-      - build-images
-      taskRef:
-        params:
-        - name: name
-          value: build-image-index
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.2@sha256:985d1efe861b02524a7679ecd855624b3d4e3a2e835b6f8a97ec7d135898ec0b
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values:
-        - "true"
-    - name: deprecated-base-image-check
-      params:
-      - name: IMAGE_URL
-        value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: IMAGE_DIGEST
-        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      runAfter:
-      - build-image-index
-      taskRef:
-        params:
-        - name: name
-          value: deprecated-image-check
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.5@sha256:808fe09bb5b8503de569de097ae5dd619a7488110f79e8e215e69862ee3fce6d
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
-    - name: apply-tags
-      params:
-      - name: IMAGE_URL
-        value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: IMAGE_DIGEST
-        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      runAfter:
-      - build-image-index
-      taskRef:
-        params:
-        - name: name
-          value: apply-tags
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.2@sha256:c89cd10b2a3f4c43789c5f06ef2b86f528b28f156c20af5e751fa8c0facd457d
-        - name: kind
-          value: task
-        resolver: bundles
-    - name: validate-fbc
-      params:
-      - name: IMAGE_URL
-        value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: IMAGE_DIGEST
-        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      runAfter:
-      - build-image-index
-      taskRef:
-        params:
-        - name: name
-          value: validate-fbc
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-validate-fbc:0.1@sha256:9d3357bdbe3ff76fdc115f3218a1a35ee257712ea2c1a03af62706ff296465dd
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
-    - name: fbc-target-index-pruning-check
-      params:
-      - name: IMAGE_URL
-        value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: IMAGE_DIGEST
-        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      - name: TARGET_INDEX
-        value: registry.redhat.io/redhat/redhat-operator-index
-      - name: RENDERED_CATALOG_DIGEST
-        value: $(tasks.validate-fbc.results.RENDERED_CATALOG_DIGEST)
-      runAfter:
-      - validate-fbc
-      taskRef:
-        params:
-        - name: name
-          value: fbc-target-index-pruning-check
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-fbc-target-index-pruning-check:0.1@sha256:801d678abd0aa49982cafaabd12e50a1614b43849fad973eafda05e512874392
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
-    - name: fbc-fips-check-oci-ta
-      params:
-      - name: image-digest
-        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      - name: image-url
-        value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-      runAfter:
-      - build-image-index
-      taskRef:
-        params:
-        - name: name
-          value: fbc-fips-check-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-fbc-fips-check-oci-ta:0.1@sha256:9b7c93bac847bdbd2b1dd260ebdde62ac9f1e44b8a357c81a9351cde7ecc7c66
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
+        - name: BUCKETS_ARTIFACT
+          value: $(tasks.extract-and-split.results.BUCKETS_ARTIFACT)
+        - name: MAX_PARALLEL
+          value: $(params.MAX_PARALLEL)
     workspaces:
     - name: git-auth
       optional: true
