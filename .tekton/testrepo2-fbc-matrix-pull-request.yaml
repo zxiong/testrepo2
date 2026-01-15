@@ -167,7 +167,7 @@ spec:
         resolver: bundles
         params:
           - name: bundle
-            value: quay.io/zxiong/fbc-fips-check-matrix:0.1
+            value: quay.io/zxiong/fbc-fips-check-matrix:0.1.1
           - name: name
             value: fbc-fips-check-bucket-oci-ta
           - name: kind
