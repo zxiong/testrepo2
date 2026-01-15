@@ -33,11 +33,11 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: image-url
-    value: quay.io/redhat-user-workloads/ose-osc-tenant/osc-fbc-4-19:on-pr-51fa2f15aaa1dd73203cc636c3647c2ae02356d0
+    value: quay.io/redhat-user-workloads/service-mesh-tenant/ossm-fbc-v4-17:on-pr-e3cc9b9d9c523686a3d307189eac6fe8d7f00a70
   - name: image-digest
-    value: sha256:981e50cc51c449f319c8816b9d83124fed8e098d3eeba7afb69cf90b4d7f56a3
+    value: sha256:f39be6dfd91eba7696a301148ed0a3aae045c0a31097631e91d8861a4f464732
   - name: SOURCE_ARTIFACT
-    value: "oci:quay.io/redhat-user-workloads/ose-osc-tenant/osc-fbc-4-19@sha256:19d20a2ef4bb6189e2215d6dfbad63bd769158292a8bf86d9f184786a6ac5f06"
+    value: "oci:quay.io/redhat-user-workloads/service-mesh-tenant/ossm-fbc-v4-17@sha256:730b1238e6e043a8acae687fd48fdbbe78072cc64168314c49f5ac2090a8b15c"
   - name: LOAD_BALANCE
     value: "true"
   - name: NUM_BUCKETS
