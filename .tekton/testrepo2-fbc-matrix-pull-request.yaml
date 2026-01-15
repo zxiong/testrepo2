@@ -41,7 +41,9 @@ spec:
   - name: LOAD_BALANCE
     value: "true"
   - name: NUM_BUCKETS
-    value: "1"
+    value: "2"
+  - name: "MAX_PARALLEL"
+    value: "2"
   pipelineSpec:
     description: |
       This pipeline is ideal for building and verifying [file-based catalogs](https://konflux-ci.dev/docs/end-to-end/building-olm/#building-the-file-based-catalog).
@@ -115,6 +117,30 @@ spec:
         set of values is determined by the configuration of the multi-platform-controller.
       name: build-platforms
       type: array
+    - name: image-url
+      type: string
+      description: "FBC fragment image URL"
+    - name: image-digest
+      type: string
+      description: "FBC fragment image digest"
+    - name: SOURCE_ARTIFACT
+      type: string
+      description: "Trusted artifact URI with source code"
+    - name: output-image
+      type: string
+      description: "Base image URL for storing artifacts"
+    - name: NUM_BUCKETS
+      type: string
+      description: "Number of buckets for parallel processing"
+    - name: LOAD_BALANCE
+      type: string
+      description: "Enable load balancing based on image sizes (true/false)"
+    - name: SIZE_FETCH_PARALLEL
+      type: string
+      description: "Number of parallel image size fetches"
+    - name: MAX_PARALLEL
+      type: string
+      description: "Max parallel images within each bucket"
     results:
       - name: TOTAL_IMAGES
         description: Total number of unique images
