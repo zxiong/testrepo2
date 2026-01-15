@@ -67,8 +67,7 @@ spec:
       name: path-context
       type: string
     - default: Dockerfile
-      description: Path to the Dockerfile inside the context specified by parameter
-        path-context
+      description: Path to the Dockerfile inside the context specified by parameter path-context
       name: dockerfile
       type: string
     - default: "false"
@@ -117,30 +116,6 @@ spec:
         set of values is determined by the configuration of the multi-platform-controller.
       name: build-platforms
       type: array
-    - name: image-url
-      type: string
-      description: "FBC fragment image URL"
-    - name: image-digest
-      type: string
-      description: "FBC fragment image digest"
-    - name: SOURCE_ARTIFACT
-      type: string
-      description: "Trusted artifact URI with source code"
-    - name: output-image
-      type: string
-      description: "Base image URL for storing artifacts"
-    - name: NUM_BUCKETS
-      type: string
-      description: "Number of buckets for parallel processing"
-    - name: LOAD_BALANCE
-      type: string
-      description: "Enable load balancing based on image sizes (true/false)"
-    - name: SIZE_FETCH_PARALLEL
-      type: string
-      description: "Number of parallel image size fetches"
-    - name: MAX_PARALLEL
-      type: string
-      description: "Max parallel images within each bucket"
     results:
       - name: TOTAL_IMAGES
         description: Total number of unique images
