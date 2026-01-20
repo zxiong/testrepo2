@@ -36,7 +36,7 @@ spec:
   - name: MAX_PARALLEL
     value: "2"
   - name: ENABLE_LOAD_BALANCING
-    value: "false"
+    value: "true"
   - name: PARALLEL_FETCH_LIMIT
     value: "5" 
   pipelineSpec:
